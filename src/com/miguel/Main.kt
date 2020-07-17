@@ -4,6 +4,7 @@ import com.miguel.util.ProximitySensor
 import com.miguel.util.Vector
 import coppelia.*
 import java.util.*
+import kotlin.math.abs
 import kotlin.properties.Delegates
 
 object Main {
@@ -96,8 +97,10 @@ object Main {
             var startTime: Float
             var endTime = 0F
 
-            var rightVelocity = 0.0
-            var leftVelocity = 0.0
+            var rightVelocity = 3.0
+            var leftVelocity = 3.0
+
+            var vref = 3.0
 
             sim.simxStartSimulation(clientId, remoteApi.simx_opmode_oneshot)
 
@@ -110,12 +113,38 @@ object Main {
 
                 val robotVector = Vector(robotPos.array[0].toDouble(), robotPos.array[1].toDouble(), robotPos.array[2].toDouble())
 
+                val elapsedTime = abs(endTime - startTime)
+
+                val sensors = getSimulationData("lightSensors")
+
+                if (sensors[0] < 0.5) {
+                    leftVelocity = 0.0
+                    rightVelocity = vref + 1
+                }
+
+                if (sensors[1] < 0.5) {
+                    rightVelocity = vref
+                    leftVelocity = vref
+                }
+
+                if (sensors[2] < 0.5) {
+                    rightVelocity = 0.0
+                    leftVelocity = vref + 1
+                }
+
                 sim.simxPauseCommunication(clientId, true)
                 sim.simxSetJointTargetVelocity(clientId, rightMotorHandle.value, rightVelocity.toFloat(), remoteApi.simx_opmode_oneshot)
                 sim.simxSetJointTargetVelocity(clientId, leftMotorHandle.value, leftVelocity.toFloat(), remoteApi.simx_opmode_oneshot)
                 sim.simxPauseCommunication(clientId, false)
 
-                println(getSimulationData("lightSensors").contentToString())
+
+                proximitySensors.forEach {
+                    sim.simxReadProximitySensor(clientId, it.handle, it.detectionState, it.detectedPoint, null, null, remoteApi.simx_opmode_buffer)
+
+                    /*if (it.getState()) {
+                        println(it.detectedPoint.array!!.contentToString())
+                    }*/
+                }
 
                 endTime = getSimulationTime()
             }
