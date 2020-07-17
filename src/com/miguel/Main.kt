@@ -1,10 +1,10 @@
 package com.miguel
 
+import com.miguel.util.Pid
 import com.miguel.util.ProximitySensor
 import com.miguel.util.Vector
 import coppelia.*
 import java.util.*
-import kotlin.math.abs
 import kotlin.properties.Delegates
 
 object Main {
@@ -94,58 +94,89 @@ object Main {
 
             val running = true
 
-            var startTime: Float
-            var endTime = 0F
+            val vRef = 3.0
 
-            var rightVelocity = 3.0
-            var leftVelocity = 3.0
+            var rightVelocity = vRef
+            var leftVelocity = vRef
 
-            var vref = 3.0
+            val white = 0.7
+            val black = 0.5
 
             sim.simxStartSimulation(clientId, remoteApi.simx_opmode_oneshot)
 
-            while (running) {
-                startTime = getSimulationTime()
+            val pid = Pid(1.25, 0.05, 0.0, 3.0)
 
+            while (running) {
                 sim.simxGetObjectPosition(clientId, robotHandle.value, -1, robotPos, remoteApi.simx_opmode_buffer)
 
                 sim.simxGetObjectOrientation(clientId, robotHandle.value, -1, robotOrientation, remoteApi.simx_opmode_buffer)
 
                 val robotVector = Vector(robotPos.array[0].toDouble(), robotPos.array[1].toDouble(), robotPos.array[2].toDouble())
 
-                val elapsedTime = abs(endTime - startTime)
-
                 val sensors = getSimulationData("lightSensors")
 
-                if (sensors[0] < 0.5) {
-                    leftVelocity = 0.0
-                    rightVelocity = vref + 1
-                }
+                val normalizedLeft = (sensors[0] - white) / (black - white)
+                val normalizedRight = (sensors[2] - white) / (black - white)
 
-                if (sensors[1] < 0.5) {
-                    rightVelocity = vref
-                    leftVelocity = vref
-                }
+                val out = pid.update(0 - (normalizedLeft - normalizedRight), 0.05)
 
-                if (sensors[2] < 0.5) {
-                    rightVelocity = 0.0
-                    leftVelocity = vref + 1
-                }
+                rightVelocity = vRef - out
+                leftVelocity = vRef + out
 
                 proximitySensors.forEach {
                     sim.simxReadProximitySensor(clientId, it.handle, it.detectionState, it.detectedPoint, null, null, remoteApi.simx_opmode_buffer)
 
-                    /*if (it.getState()) {
-                        println(it.detectedPoint.array!!.contentToString())
-                    }*/
+                    if (it.getState()) {
+                        when (proximitySensors.indexOf(it)) {
+
+                            0 -> {
+                                leftVelocity = vRef
+                                rightVelocity = -vRef
+                            }
+
+                            1 -> {
+                                leftVelocity = vRef
+                                rightVelocity = -vRef
+                            }
+
+                            2 -> {
+                                leftVelocity = vRef
+                                rightVelocity = -vRef
+                            }
+
+                            3 -> {
+                                leftVelocity = -vRef
+                                rightVelocity = vRef
+                            }
+
+                            4 -> {
+                                leftVelocity = -vRef
+                                rightVelocity = vRef
+                            }
+
+                            5 -> {
+                                leftVelocity = -vRef
+                                rightVelocity = vRef
+                            }
+
+                            6 -> {
+
+                            }
+
+                            7 -> {
+
+                            }
+
+                            else -> {
+                            }
+                        }
+                    }
                 }
 
                 sim.simxPauseCommunication(clientId, true)
                 sim.simxSetJointTargetVelocity(clientId, rightMotorHandle.value, rightVelocity.toFloat(), remoteApi.simx_opmode_oneshot)
                 sim.simxSetJointTargetVelocity(clientId, leftMotorHandle.value, leftVelocity.toFloat(), remoteApi.simx_opmode_oneshot)
                 sim.simxPauseCommunication(clientId, false)
-
-                endTime = getSimulationTime()
             }
 
             sim.simxFinish(clientId)
