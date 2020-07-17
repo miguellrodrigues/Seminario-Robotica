@@ -132,12 +132,6 @@ object Main {
                     leftVelocity = vref + 1
                 }
 
-                sim.simxPauseCommunication(clientId, true)
-                sim.simxSetJointTargetVelocity(clientId, rightMotorHandle.value, rightVelocity.toFloat(), remoteApi.simx_opmode_oneshot)
-                sim.simxSetJointTargetVelocity(clientId, leftMotorHandle.value, leftVelocity.toFloat(), remoteApi.simx_opmode_oneshot)
-                sim.simxPauseCommunication(clientId, false)
-
-
                 proximitySensors.forEach {
                     sim.simxReadProximitySensor(clientId, it.handle, it.detectionState, it.detectedPoint, null, null, remoteApi.simx_opmode_buffer)
 
@@ -145,6 +139,11 @@ object Main {
                         println(it.detectedPoint.array!!.contentToString())
                     }*/
                 }
+
+                sim.simxPauseCommunication(clientId, true)
+                sim.simxSetJointTargetVelocity(clientId, rightMotorHandle.value, rightVelocity.toFloat(), remoteApi.simx_opmode_oneshot)
+                sim.simxSetJointTargetVelocity(clientId, leftMotorHandle.value, leftVelocity.toFloat(), remoteApi.simx_opmode_oneshot)
+                sim.simxPauseCommunication(clientId, false)
 
                 endTime = getSimulationTime()
             }
