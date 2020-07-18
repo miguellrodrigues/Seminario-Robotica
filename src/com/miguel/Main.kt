@@ -96,8 +96,8 @@ object Main {
 
             val vRef = 3.0
 
-            var rightVelocity = vRef
-            var leftVelocity = vRef
+            var rightVelocity: Double
+            var leftVelocity: Double
 
             val white = 0.7
             val black = 0.5
