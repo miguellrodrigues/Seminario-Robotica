@@ -2,7 +2,6 @@ package com.miguel
 
 import com.miguel.util.Pid
 import com.miguel.util.ProximitySensor
-import com.miguel.util.Vector
 import coppelia.*
 import java.util.*
 import kotlin.properties.Delegates
@@ -111,7 +110,7 @@ object Main {
 
                 sim.simxGetObjectOrientation(clientId, robotHandle.value, -1, robotOrientation, remoteApi.simx_opmode_buffer)
 
-                val robotVector = Vector(robotPos.array[0].toDouble(), robotPos.array[1].toDouble(), robotPos.array[2].toDouble())
+                // val robotVector = Vector(robotPos.array[0].toDouble(), robotPos.array[1].toDouble(), robotPos.array[2].toDouble())
 
                 val sensors = getSimulationData("lightSensors")
 
