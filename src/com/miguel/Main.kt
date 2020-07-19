@@ -158,7 +158,13 @@ object Main {
 
             var actualVictim = victims.removeFirst()
 
-            val rescueArea = Vector(-5.5750, .5, 0.01)
+            val rescueArea = Vector(-5.5750, .5, 0.017)
+
+            val rescueAreaPosition = FloatWA(3)
+
+            rescueAreaPosition.array[0] = rescueArea.x.toFloat()
+            rescueAreaPosition.array[1] = rescueArea.y.toFloat()
+            rescueAreaPosition.array[2] = rescueArea.z.toFloat()
 
             var action = "catch"
 
@@ -214,23 +220,26 @@ object Main {
                             robotVector.differenceAngle(rescueArea)
                         }
 
-                        if (action == "catch" && distance <= 0.03) {
-                            action = "carry"
-                            continue@loop
-                        }
-
                         if (action == "carry") {
                             if (distance <= 0.03) {
-                                actualVictim = victims.removeFirst()
+                                sim.simxSetObjectPosition(clientId, actualVictim.handle, -1, rescueAreaPosition, remoteApi.simx_opmode_oneshot)
 
                                 if (victims.isEmpty()) {
                                     break@loop
                                 }
 
+                                actualVictim = victims.removeFirst()
+
                                 action = "catch"
+
+                                continue@loop
                             } else {
                                 sim.simxSetObjectPosition(clientId, actualVictim.handle, -1, robotPos, remoteApi.simx_opmode_oneshot)
                             }
+                        }
+
+                        if (action == "catch" && distance <= 0.03) {
+                            action = "carry"
                         }
 
                         val angleOUT = anglePID.update(Angle.normalizeRadian((robotOrientation.array[2] + PI / 2) - theta), 0.05)

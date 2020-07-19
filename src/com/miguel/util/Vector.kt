@@ -5,7 +5,7 @@ import kotlin.math.hypot
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-class Vector(private var x: Double, var y: Double, private var z: Double) {
+class Vector(var x: Double, var y: Double, var z: Double) {
 
     fun add(vector: Vector): Vector {
         x += vector.x
