@@ -162,7 +162,7 @@ object Main {
 
             var actualVictim = victims.removeFirst()
 
-            val rescueArea = Vector(-5.5750, .5, 0.017)
+            val rescueArea = Vector(-5.5750, .5, 0.0168)
 
             val rescueAreaPosition = FloatWA(3)
 
@@ -171,6 +171,8 @@ object Main {
             rescueAreaPosition.array[2] = rescueArea.z.toFloat()
 
             var action = "catch"
+
+            var increment = 0.25
 
             loop@ while (running) {
                 sim.simxGetObjectPosition(clientId, robotHandle.value, -1, robotPos, remoteApi.simx_opmode_buffer)
@@ -227,6 +229,10 @@ object Main {
 
                         if (action == "carry") {
                             if (distance <= 0.01) {
+                                rescueAreaPosition.array[2] += increment.toFloat()
+
+                                increment += 0.25
+
                                 sim.simxSetObjectPosition(clientId, actualVictim.handle, -1, rescueAreaPosition, remoteApi.simx_opmode_oneshot)
 
                                 if (victims.isEmpty()) {
@@ -239,8 +245,6 @@ object Main {
 
                                 continue@loop
                             } else {
-                                robotPos.array[2] = 0.002F
-
                                 sim.simxSetObjectPosition(clientId, actualVictim.handle, -1, robotPos, remoteApi.simx_opmode_oneshot)
                             }
                         }
