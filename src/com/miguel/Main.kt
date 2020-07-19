@@ -7,13 +7,14 @@ import com.miguel.util.Vector
 import coppelia.*
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.PI
 import kotlin.properties.Delegates
 
 object Main {
 
     private const val robot = "ePuck"
 
-    private var state = "labirinto"
+    private var state = "maze"
 
     private val sim = remoteApi()
 
@@ -47,6 +48,11 @@ object Main {
 
         return out.array.toTypedArray()
     }
+
+    data class Victim(
+            val position: Vector,
+            val handle: Int
+    )
 
     @JvmStatic
     fun main(args: Array<String>) {
@@ -90,8 +96,8 @@ object Main {
                 sim.simxReadProximitySensor(clientId, it.handle, it.detectionState, it.detectedPoint, null, null, remoteApi.simx_opmode_streaming)
             }
 
-            val victimVectors = LinkedList<Vector>()
-            val victims = LinkedList<Vector>()
+            val victimVectors = LinkedList<Victim>()
+            val victims = LinkedList<Victim>()
 
             for (i in 0..10) {
                 val handle = IntW(1)
@@ -101,26 +107,27 @@ object Main {
                 val position = FloatWA(3)
                 sim.simxGetObjectPosition(clientId, handle.value, -1, position, remoteApi.simx_opmode_blocking)
 
-                victimVectors.add(Vector(
-                        position.array[0].toDouble(),
-                        position.array[1].toDouble(),
-                        position.array[2].toDouble()
-                ))
+                victimVectors.add(
+                        Victim(
+                                Vector(position.array[0].toDouble(),
+                                        position.array[1].toDouble(),
+                                        position.array[2].toDouble()),
+                                handle.value))
             }
 
             synchronized(this) {
-                val sort = ArrayList<Vector>()
+                val sort = ArrayList<Victim>()
 
                 victimVectors.asReversed().forEach {
                     sort.add(it)
                 }
 
-                sort.sortWith(Comparator.comparingDouble { it.distance(victimVectors[3]) })
+                sort.sortWith(Comparator.comparingDouble { it.position.distance(victimVectors[3].position) })
 
                 var actual = sort.first()
 
                 sort.forEach { _ ->
-                    victimVectors.sortWith(Comparator.comparingDouble { value -> value.distance(actual) })
+                    victimVectors.sortWith(Comparator.comparingDouble { value -> value.position.distance(actual.position) })
 
                     actual = victimVectors.removeFirst()
 
@@ -148,11 +155,12 @@ object Main {
             val anglePID = Pid(5.0, 0.0, 0.0, 8.0)
 
             val finish = Vector(-2.5, -1.75, 0.02)
-            var actualVictim = victims.first()
 
-            val rescueArea = Vector(-3.7250, -3.5750, 0.01)
+            var actualVictim = victims.removeFirst()
 
-            var action = "pegar"
+            val rescueArea = Vector(-5.5750, .5, 0.01)
+
+            var action = "catch"
 
             loop@ while (running) {
                 sim.simxGetObjectPosition(clientId, robotHandle.value, -1, robotPos, remoteApi.simx_opmode_buffer)
@@ -162,11 +170,11 @@ object Main {
                 val robotVector = Vector(robotPos.array[0].toDouble(), robotPos.array[1].toDouble(), robotPos.array[2].toDouble())
 
                 when (state) {
-                    "labirinto" -> {
+                    "maze" -> {
                         val distance = robotVector.distance(finish)
 
                         if (distance <= 0.4) {
-                            state = "resgate"
+                            state = "rescue"
                         }
 
                         rightVelocity = vRef
@@ -191,68 +199,95 @@ object Main {
                             rightVelocity = vRef - out
                             leftVelocity = vRef + out
                         }
-
-                        proximitySensors.forEach {
-                            sim.simxReadProximitySensor(clientId, it.handle, it.detectionState, it.detectedPoint, null, null, remoteApi.simx_opmode_buffer)
-
-                            if (it.getState()) {
-                                when (proximitySensors.indexOf(it)) {
-
-                                    0 -> {
-                                        leftVelocity = vRef
-                                        rightVelocity = 0.0
-                                    }
-
-                                    1 -> {
-                                        leftVelocity = vRef
-                                        rightVelocity = 0.0
-                                    }
-
-                                    2 -> {
-                                        leftVelocity = vRef
-                                        rightVelocity = 0.0
-                                    }
-
-                                    3 -> {
-                                        leftVelocity = 0.0
-                                        rightVelocity = vRef
-                                    }
-
-                                    4 -> {
-                                        leftVelocity = 0.0
-                                        rightVelocity = vRef
-                                    }
-
-                                    5 -> {
-                                        leftVelocity = 0.0
-                                        rightVelocity = vRef
-                                    }
-
-                                    6 -> {
-
-                                    }
-
-                                    7 -> {
-
-                                    }
-
-                                    else -> {
-                                    }
-                                }
-                            }
-                        }
                     }
 
-                    "resgate" -> {
-                        val distance = robotVector.distance(rescueArea)
+                    "rescue" -> {
+                        val distance = if (action == "catch") {
+                            robotVector.distance(actualVictim.position)
+                        } else {
+                            robotVector.distance(rescueArea)
+                        }
 
-                        val theta = robotVector.differenceAngle(rescueArea)
+                        val theta = if (action == "catch") {
+                            robotVector.differenceAngle(actualVictim.position)
+                        } else {
+                            robotVector.differenceAngle(rescueArea)
+                        }
 
-                        val angleOUT = anglePID.update(Angle.normalizeRadian(robotOrientation.array[2] - theta), 0.05)
+                        if (action == "catch" && distance <= 0.03) {
+                            action = "carry"
+                            continue@loop
+                        }
+
+                        if (action == "carry") {
+                            if (distance <= 0.03) {
+                                actualVictim = victims.removeFirst()
+
+                                if (victims.isEmpty()) {
+                                    break@loop
+                                }
+
+                                action = "catch"
+                            } else {
+                                sim.simxSetObjectPosition(clientId, actualVictim.handle, -1, robotPos, remoteApi.simx_opmode_oneshot)
+                            }
+                        }
+
+                        val angleOUT = anglePID.update(Angle.normalizeRadian((robotOrientation.array[2] + PI / 2) - theta), 0.05)
                         val distanceOUT = distancePID.update(distance - 0.03, 0.05)
 
                         rightVelocity = -angleOUT + distanceOUT
                         leftVelocity = angleOUT + distanceOUT
+                    }
+                }
+
+                proximitySensors.forEach {
+                    sim.simxReadProximitySensor(clientId, it.handle, it.detectionState, it.detectedPoint, null, null, remoteApi.simx_opmode_buffer)
+
+                    if (it.getState()) {
+                        when (proximitySensors.indexOf(it)) {
+
+                            0 -> {
+                                leftVelocity = vRef
+                                rightVelocity = 0.0
+                            }
+
+                            1 -> {
+                                leftVelocity = vRef
+                                rightVelocity = 0.0
+                            }
+
+                            2 -> {
+                                leftVelocity = vRef
+                                rightVelocity = 0.0
+                            }
+
+                            3 -> {
+                                leftVelocity = 0.0
+                                rightVelocity = vRef
+                            }
+
+                            4 -> {
+                                leftVelocity = 0.0
+                                rightVelocity = vRef
+                            }
+
+                            5 -> {
+                                leftVelocity = 0.0
+                                rightVelocity = vRef
+                            }
+
+                            6 -> {
+
+                            }
+
+                            7 -> {
+
+                            }
+
+                            else -> {
+                            }
+                        }
                     }
                 }
 
