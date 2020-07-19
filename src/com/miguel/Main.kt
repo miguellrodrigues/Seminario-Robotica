@@ -49,6 +49,10 @@ object Main {
         return out.array.toTypedArray()
     }
 
+    private fun getSimulationTime(): Float {
+        return getSimulationData("time")[0]
+    }
+
     data class Victim(
             val position: Vector,
             val handle: Int
@@ -139,7 +143,7 @@ object Main {
 
             val running = true
 
-            val vRef = 4.0
+            val vRef = 3.0
 
             var rightVelocity = vRef
             var leftVelocity = vRef
@@ -149,10 +153,10 @@ object Main {
 
             sim.simxStartSimulation(clientId, remoteApi.simx_opmode_oneshot)
 
-            val linePID = Pid(1.35, 0.09, 0.0, 4.0)
+            val linePID = Pid(1.5, 0.15, 0.0, 3.0)
 
-            val distancePID = Pid(1.0, .1, .1, 8.0)
-            val anglePID = Pid(5.0, 0.0, 0.0, 8.0)
+            val distancePID = Pid(8.0, .5, .0, 3.0)
+            val anglePID = Pid(5.0, 0.0, 0.0, 3.0)
 
             val finish = Vector(-2.5, -1.75, 0.02)
 
@@ -181,6 +185,7 @@ object Main {
 
                         if (distance <= 0.4) {
                             state = "rescue"
+                            continue@loop
                         }
 
                         rightVelocity = vRef
@@ -221,7 +226,7 @@ object Main {
                         }
 
                         if (action == "carry") {
-                            if (distance <= 0.03) {
+                            if (distance <= 0.01) {
                                 sim.simxSetObjectPosition(clientId, actualVictim.handle, -1, rescueAreaPosition, remoteApi.simx_opmode_oneshot)
 
                                 if (victims.isEmpty()) {
@@ -234,11 +239,13 @@ object Main {
 
                                 continue@loop
                             } else {
+                                robotPos.array[2] = 0.002F
+
                                 sim.simxSetObjectPosition(clientId, actualVictim.handle, -1, robotPos, remoteApi.simx_opmode_oneshot)
                             }
                         }
 
-                        if (action == "catch" && distance <= 0.03) {
+                        if (action == "catch" && distance <= 0.01) {
                             action = "carry"
                         }
 
