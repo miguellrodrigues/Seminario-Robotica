@@ -113,7 +113,8 @@ object Main {
                         Victim(
                                 Vector(position.array[0].toDouble(),
                                         position.array[1].toDouble(),
-                                        position.array[2].toDouble()),
+                                        position.array[2].toDouble()
+                                ),
                                 handle.value))
             }
 
@@ -169,10 +170,11 @@ object Main {
 
             val points = ArrayList<Vector>()
 
-            val radiusConstant = 0.00222222222222222222222222222222 // 0,85 / 360
+            val radiusConstant = 0.00222222222222222222222222222222 // 0,8 / 360
 
             for (i in 0..360) {
                 val radians = Math.toRadians(i.toDouble())
+
                 val radius = radiusConstant * i
 
                 val x = radius * cos(radians)
