@@ -1,8 +1,8 @@
 package com.miguel
 
+import com.miguel.control.Pid
+import com.miguel.sensor.ProximitySensor
 import com.miguel.util.Angle
-import com.miguel.util.Pid
-import com.miguel.util.ProximitySensor
 import com.miguel.util.Vector
 import coppelia.*
 import java.util.*
@@ -125,7 +125,9 @@ object Main {
                     sort.add(it)
                 }
 
-                sort.sortWith(Comparator.comparingDouble { it.position.distance(victimVectors[3].position) })
+                sort.sortWith(Comparator.comparingDouble { it.position.distance(victimVectors[4].position) })
+
+                println(victimVectors.size)
 
                 var actual = sort.first()
 
@@ -154,7 +156,7 @@ object Main {
 
             val linePID = Pid(1.5, 0.15, 0.0, 3.0)
 
-            val distancePID = Pid(8.0, 2.5, .0, 8.0)
+            val distancePID = Pid(5.0, .5, .0, 8.0)
             val anglePID = Pid(5.0, .0, .0, 4.0)
 
             val finish = Vector(-2.5, -1.75, 0.02)
@@ -170,7 +172,7 @@ object Main {
 
             val points = ArrayList<Vector>()
 
-            val radiusConstant = 0.00222222222222222222222222222222 // 0,8 / 360
+            val radiusConstant = 0.00236111111111111111111111111111
 
             for (i in 0..360) {
                 val radians = Math.toRadians(i.toDouble())
@@ -246,6 +248,8 @@ object Main {
 
                                 rescueAreaPosition.array[0] = point.x.toFloat()
                                 rescueAreaPosition.array[1] = point.y.toFloat()
+
+                                points.remove(point)
 
                                 sim.simxSetObjectPosition(clientId, actualVictim.handle, -1, rescueAreaPosition, remoteApi.simx_opmode_oneshot)
 

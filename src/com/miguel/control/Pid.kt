@@ -1,4 +1,4 @@
-package com.miguel.util
+package com.miguel.control
 
 class Pid(private val kp: Double, private val ki: Double, private val kd: Double, private val saturation: Double) {
 

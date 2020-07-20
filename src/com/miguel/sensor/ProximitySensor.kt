@@ -1,5 +1,7 @@
-package com.miguel.util
+package com.miguel.sensor
 
+import com.miguel.control.Pid
+import com.miguel.util.Vector
 import coppelia.BoolW
 import coppelia.FloatWA
 
