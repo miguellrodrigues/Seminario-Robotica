@@ -127,8 +127,6 @@ object Main {
 
                 sort.sortWith(Comparator.comparingDouble { it.position.distance(victimVectors[4].position) })
 
-                println(victimVectors.size)
-
                 var actual = sort.first()
 
                 sort.forEach { _ ->
