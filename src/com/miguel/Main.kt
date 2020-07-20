@@ -8,6 +8,8 @@ import coppelia.*
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
 import kotlin.properties.Delegates
 
 object Main {
@@ -47,10 +49,6 @@ object Main {
         )
 
         return out.array.toTypedArray()
-    }
-
-    private fun getSimulationTime(): Float {
-        return getSimulationData("time")[0]
     }
 
     data class Victim(
@@ -155,24 +153,37 @@ object Main {
 
             val linePID = Pid(1.5, 0.15, 0.0, 3.0)
 
-            val distancePID = Pid(8.0, .5, .0, 3.0)
-            val anglePID = Pid(5.0, 0.0, 0.0, 3.0)
+            val distancePID = Pid(8.0, 2.5, .0, 8.0)
+            val anglePID = Pid(5.0, .0, .0, 4.0)
 
             val finish = Vector(-2.5, -1.75, 0.02)
 
             var actualVictim = victims.removeFirst()
 
-            val rescueArea = Vector(-5.5750, .5, 0.0168)
+            val rescueArea = Vector(-5.0, 1.5, 0.0168)
 
             val rescueAreaPosition = FloatWA(3)
-
-            rescueAreaPosition.array[0] = rescueArea.x.toFloat()
-            rescueAreaPosition.array[1] = rescueArea.y.toFloat()
-            rescueAreaPosition.array[2] = rescueArea.z.toFloat()
+            rescueAreaPosition.array[2] = 0.0330.toFloat()
 
             var action = "catch"
 
-            var increment = 0.25
+            val points = ArrayList<Vector>()
+
+            val radiusConstant = 0.00222222222222222222222222222222 // 0,85 / 360
+
+            for (i in 0..360) {
+                val radians = Math.toRadians(i.toDouble())
+                val radius = radiusConstant * i
+
+                val x = radius * cos(radians)
+                val y = radius * sin(radians)
+
+                rescueArea.add(Vector(x, y, 0.0))
+
+                points.add(rescueArea.clone())
+
+                rescueArea.subtract(Vector(x, y, 0.0))
+            }
 
             loop@ while (running) {
                 sim.simxGetObjectPosition(clientId, robotHandle.value, -1, robotPos, remoteApi.simx_opmode_buffer)
@@ -229,9 +240,10 @@ object Main {
 
                         if (action == "carry") {
                             if (distance <= 0.01) {
-                                rescueAreaPosition.array[2] += increment.toFloat()
+                                val point = points[(0 until points.size).random()]
 
-                                increment += 0.25
+                                rescueAreaPosition.array[0] = point.x.toFloat()
+                                rescueAreaPosition.array[1] = point.y.toFloat()
 
                                 sim.simxSetObjectPosition(clientId, actualVictim.handle, -1, rescueAreaPosition, remoteApi.simx_opmode_oneshot)
 
@@ -245,6 +257,8 @@ object Main {
 
                                 continue@loop
                             } else {
+                                robotPos.array[2] = 0.002.toFloat()
+
                                 sim.simxSetObjectPosition(clientId, actualVictim.handle, -1, robotPos, remoteApi.simx_opmode_oneshot)
                             }
                         }
@@ -254,7 +268,7 @@ object Main {
                         }
 
                         val angleOUT = anglePID.update(Angle.normalizeRadian((robotOrientation.array[2] + PI / 2) - theta), 0.05)
-                        val distanceOUT = distancePID.update(distance - 0.03, 0.05)
+                        val distanceOUT = distancePID.update(distance, 0.05)
 
                         rightVelocity = -angleOUT + distanceOUT
                         leftVelocity = angleOUT + distanceOUT
@@ -266,7 +280,6 @@ object Main {
 
                     if (it.getState()) {
                         when (proximitySensors.indexOf(it)) {
-
                             0 -> {
                                 leftVelocity = vRef
                                 rightVelocity = 0.0

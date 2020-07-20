@@ -102,6 +102,10 @@ class Vector(var x: Double, var y: Double, var z: Double) {
         return this
     }
 
+    fun clone(): Vector {
+        return Vector(x, y, z)
+    }
+
     override fun toString(): String {
         return "Vector(x=$x, y=$y, z=$z)"
     }

@@ -12,7 +12,7 @@ class Pid(private val kp: Double, private val ki: Double, private val kd: Double
         oldError = this.error
         this.error = error
 
-        if (saturation > out) {
+        if (saturation > out && out > -saturation) {
             accumulator += (error + oldError) / 2 * time
         }
 
