@@ -156,7 +156,7 @@ object Main {
 
             val linePID = Pid(1.5, 0.15, 0.0, 3.0)
 
-            val distancePID = Pid(4.0, .1, .00001, 4.0)
+            val distancePID = Pid(3.0, .1, .00001, 4.0)
             val anglePID = Pid(5.0, .0, .0, 4.0)
 
             val finish = Vector(-2.5, -1.75, 0.02)
@@ -175,8 +175,8 @@ object Main {
 
                 val radius = radiusConstant * i
 
-                val x = radius * cos(radians)
-                val y = radius * sin(radians)
+                val x = (radius * cos(radians)) + 0.05
+                val y = (radius * sin(radians)) + 0.05
 
                 val point = Vector(x, y, 0.0)
 
