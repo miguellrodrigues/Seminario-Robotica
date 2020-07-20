@@ -17,6 +17,7 @@ object Main {
     private const val robot = "ePuck"
 
     private var state = "maze"
+    private var action = "catch"
 
     private val sim = remoteApi()
 
@@ -111,12 +112,15 @@ object Main {
 
                 victimVectors.add(
                         Victim(
-                                Vector(position.array[0].toDouble(),
+                                Vector(
+                                        position.array[0].toDouble(),
                                         position.array[1].toDouble(),
                                         position.array[2].toDouble()
                                 ),
                                 handle.value))
             }
+
+            val rescueArea = Vector(-5.0, 1.5, 0.0168)
 
             synchronized(this) {
                 val sort = ArrayList<Victim>()
@@ -125,12 +129,12 @@ object Main {
                     sort.add(it)
                 }
 
-                sort.sortWith(Comparator.comparingDouble { it.position.distance(victimVectors[4].position) })
+                sort.asReversed().sortWith(Comparator.comparingDouble { it.position.distance(rescueArea) })
 
                 var actual = sort.first()
 
                 sort.forEach { _ ->
-                    victimVectors.sortWith(Comparator.comparingDouble { value -> value.position.distance(actual.position) })
+                    victimVectors.sortWith(Comparator.comparingDouble { it.position.distance(actual.position) })
 
                     actual = victimVectors.removeFirst()
 
@@ -150,23 +154,17 @@ object Main {
             val white = 0.8
             val black = 0.5
 
-            sim.simxStartSimulation(clientId, remoteApi.simx_opmode_oneshot)
-
             val linePID = Pid(1.5, 0.15, 0.0, 3.0)
 
-            val distancePID = Pid(5.0, .5, .0, 8.0)
+            val distancePID = Pid(4.0, .1, .00001, 4.0)
             val anglePID = Pid(5.0, .0, .0, 4.0)
 
             val finish = Vector(-2.5, -1.75, 0.02)
 
-            var actualVictim = victims.removeFirst()
-
-            val rescueArea = Vector(-5.0, 1.5, 0.0168)
-
             val rescueAreaPosition = FloatWA(3)
             rescueAreaPosition.array[2] = 0.0330.toFloat()
 
-            var action = "catch"
+            var actualVictim = victims.removeFirst()
 
             val points = ArrayList<Vector>()
 
@@ -180,12 +178,16 @@ object Main {
                 val x = radius * cos(radians)
                 val y = radius * sin(radians)
 
-                rescueArea.add(Vector(x, y, 0.0))
+                val point = Vector(x, y, 0.0)
+
+                rescueArea.add(point)
 
                 points.add(rescueArea.clone())
 
-                rescueArea.subtract(Vector(x, y, 0.0))
+                rescueArea.subtract(point)
             }
+
+            sim.simxStartSimulation(clientId, remoteApi.simx_opmode_oneshot)
 
             loop@ while (running) {
                 sim.simxGetObjectPosition(clientId, robotHandle.value, -1, robotPos, remoteApi.simx_opmode_buffer)
@@ -334,6 +336,7 @@ object Main {
                 sim.simxPauseCommunication(clientId, false)
             }
 
+            sim.simxPauseSimulation(clientId, remoteApi.simx_opmode_oneshot)
             sim.simxFinish(clientId)
 
         } else {
