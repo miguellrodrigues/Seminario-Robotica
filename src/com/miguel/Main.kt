@@ -156,13 +156,13 @@ object Main {
 
             val linePID = Pid(1.5, 0.15, 0.0, 3.0)
 
-            val distancePID = Pid(3.0, .1, .00001, 4.0)
-            val anglePID = Pid(5.0, .0, .0, 4.0)
+            val distancePID = Pid(3.0, 1.0, .0, 6.0)
+            val anglePID = Pid(5.0, .0, .0, 8.0)
 
             val finish = Vector(-2.5, -1.75, 0.02)
 
             val rescueAreaPosition = FloatWA(3)
-            rescueAreaPosition.array[2] = 0.0330.toFloat()
+            rescueAreaPosition.array[2] = 0.0333.toFloat()
 
             var actualVictim = victims.removeFirst()
 
@@ -175,8 +175,8 @@ object Main {
 
                 val radius = radiusConstant * i
 
-                val x = (radius * cos(radians)) + 0.05
-                val y = (radius * sin(radians)) + 0.05
+                val x = (radius * cos(radians))
+                val y = (radius * sin(radians))
 
                 val point = Vector(x, y, 0.0)
 
@@ -186,6 +186,8 @@ object Main {
 
                 rescueArea.subtract(point)
             }
+
+            points.shuffle()
 
             sim.simxStartSimulation(clientId, remoteApi.simx_opmode_oneshot)
 
@@ -222,7 +224,7 @@ object Main {
                             val normalizedLeft = (sensors[0] - white) / (black - white)
                             val normalizedRight = (sensors[2] - white) / (black - white)
 
-                            val out = linePID.update(0 - (normalizedLeft - normalizedRight), 0.05)
+                            val out = linePID.update(-(normalizedLeft - normalizedRight), 0.05)
 
                             rightVelocity = vRef - out
                             leftVelocity = vRef + out

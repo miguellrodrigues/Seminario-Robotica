@@ -12,15 +12,15 @@ class Pid(private val kp: Double, private val ki: Double, private val kd: Double
         oldError = this.error
         this.error = error
 
-        if (saturation > out && out > -saturation) {
-            accumulator += (error + oldError) / 2 * time
-        }
-
         val proportional = kp * error
         val integral = ki * accumulator
         val derivative = kd * (error - oldError) / time
 
         val out = proportional + integral + derivative
+
+        if (saturation > out && out > -saturation) {
+            accumulator += (error + oldError) / 2 * time
+        }
 
         this.out = out
 
