@@ -185,7 +185,7 @@ object Main {
 
             var actualVictim = victims.removeFirst()
 
-            val points = Angle.getCircumferencePoints(rescueArea, 0.85)
+            val points = Angle.getCircumferencePoints(rescueArea, 0.5)
 
             var lastPoint = points[(0 until points.size).random()]
 
@@ -252,8 +252,9 @@ object Main {
 
                                 var point = points[(0 until points.size).random()]
 
-                                while (lastPoint.distance(point) <= 0.5)
+                                while (lastPoint.distance(point) <= 0.75) {
                                     point = points[(0 until points.size).random()]
+                                }
 
                                 lastPoint = point
 
