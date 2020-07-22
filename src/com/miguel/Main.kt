@@ -268,6 +268,8 @@ object Main {
                                     break@loop
                                 }
 
+                                sendCommand("color:${actualVictim.handle}:rescued_custom")
+
                                 actualVictim = victims.removeFirst()
 
                                 action = "catch"
