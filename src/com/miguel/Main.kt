@@ -8,8 +8,6 @@ import coppelia.*
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.sin
 import kotlin.properties.Delegates
 
 object Main {
@@ -22,6 +20,27 @@ object Main {
     private val sim = remoteApi()
 
     private var clientId by Delegates.notNull<Int>()
+
+    private fun sendCommand(command: String) {
+        val options = StringWA(1)
+        options.array[0] = command
+
+        sim.simxCallScriptFunction(
+                clientId,
+                "ePuck",
+                1,
+                "processCommand",
+                IntWA(0),
+                FloatWA(0),
+                options,
+                CharWA(0),
+                IntWA(0),
+                FloatWA(0),
+                StringWA(0),
+                CharWA(0),
+                remoteApi.simx_opmode_blocking
+        )
+    }
 
     private fun getSimulationData(parameter: String): Array<Float> {
         val options = StringWA(1)
@@ -154,10 +173,10 @@ object Main {
             val white = 0.8
             val black = 0.5
 
-            val linePID = Pid(1.5, 0.15, 0.0, 3.0)
+            val linePID = Pid(1.5, .0, .0, 3.0, 0.0)
 
-            val distancePID = Pid(3.0, 1.0, .0, 6.0)
-            val anglePID = Pid(5.0, .0, .0, 8.0)
+            val distancePID = Pid(3.0, 0.5, .0, 6.0, 1.0)
+            val anglePID = Pid(5.0, .0, .0, 8.0, 0.0)
 
             val finish = Vector(-2.5, -1.75, 0.02)
 
@@ -166,26 +185,9 @@ object Main {
 
             var actualVictim = victims.removeFirst()
 
-            val points = ArrayList<Vector>()
+            val points = Angle.getCircumferencePoints(rescueArea, 0.85)
 
-            val radiusConstant = 0.00236111111111111111111111111111
-
-            for (i in 0..360) {
-                val radians = Math.toRadians(i.toDouble())
-
-                val radius = radiusConstant * i
-
-                val x = (radius * cos(radians))
-                val y = (radius * sin(radians))
-
-                val point = Vector(x, y, 0.0)
-
-                rescueArea.add(point)
-
-                points.add(rescueArea.clone())
-
-                rescueArea.subtract(point)
-            }
+            var lastPoint = points[(0 until points.size).random()]
 
             points.shuffle()
 
@@ -246,7 +248,12 @@ object Main {
 
                         if (action == "carry") {
                             if (distance <= 0.01) {
-                                val point = points[(0 until points.size).random()]
+                                var point = points[(0 until points.size).random()]
+
+                                while (point.distance(lastPoint) <= 0.5)
+                                    point = points[(0 until points.size).random()]
+
+                                lastPoint = point
 
                                 rescueAreaPosition.array[0] = point.x.toFloat()
                                 rescueAreaPosition.array[1] = point.y.toFloat()
@@ -256,6 +263,7 @@ object Main {
                                 sim.simxSetObjectPosition(clientId, actualVictim.handle, -1, rescueAreaPosition, remoteApi.simx_opmode_oneshot)
 
                                 if (victims.isEmpty()) {
+                                    sim.simxPauseSimulation(clientId, remoteApi.simx_opmode_oneshot)
                                     break@loop
                                 }
 
@@ -272,6 +280,7 @@ object Main {
                         }
 
                         if (action == "catch" && distance <= 0.01) {
+                            sendCommand("color:${actualVictim.handle}:1,1,0")
                             action = "carry"
                         }
 
@@ -338,7 +347,6 @@ object Main {
                 sim.simxPauseCommunication(clientId, false)
             }
 
-            sim.simxPauseSimulation(clientId, remoteApi.simx_opmode_oneshot)
             sim.simxFinish(clientId)
 
         } else {

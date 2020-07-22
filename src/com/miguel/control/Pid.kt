@@ -1,6 +1,6 @@
 package com.miguel.control
 
-class Pid(private val kp: Double, private val ki: Double, private val kd: Double, private val saturation: Double) {
+class Pid(private val kp: Double, private val ki: Double, private val kd: Double, private val saturation: Double, private val maxError: Double) {
 
     private var error = 0.0
 
@@ -16,11 +16,17 @@ class Pid(private val kp: Double, private val ki: Double, private val kd: Double
         val integral = ki * accumulator
         val derivative = kd * (error - oldError) / time
 
-        val out = proportional + integral + derivative
-
         if (saturation > out && out > -saturation) {
-            accumulator += (error + oldError) / 2 * time
+            if (maxError > 0) {
+                if (error < maxError) {
+                    accumulator += (error + oldError) / 2 * time
+                }
+            } else {
+                accumulator += (error + oldError) / 2 * time
+            }
         }
+
+        val out = proportional + integral + derivative
 
         this.out = out
 
