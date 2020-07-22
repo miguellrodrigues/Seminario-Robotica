@@ -144,7 +144,7 @@ object Main {
             synchronized(this) {
                 val sort = ArrayList<Victim>()
 
-                victimVectors.asReversed().forEach {
+                victimVectors.forEach {
                     sort.add(it)
                 }
 
@@ -175,7 +175,7 @@ object Main {
 
             val linePID = Pid(1.5, .0, .0, 3.0, 0.0)
 
-            val distancePID = Pid(3.0, 0.5, .0, 6.0, 1.0)
+            val distancePID = Pid(3.0, 0.5, .0, 6.0, 0.8)
             val anglePID = Pid(5.0, .0, .0, 8.0, 0.0)
 
             val finish = Vector(-2.5, -1.75, 0.02)
@@ -248,9 +248,11 @@ object Main {
 
                         if (action == "carry") {
                             if (distance <= 0.01) {
+                                points.remove(lastPoint)
+
                                 var point = points[(0 until points.size).random()]
 
-                                while (point.distance(lastPoint) <= 0.5)
+                                while (lastPoint.distance(point) <= 0.5)
                                     point = points[(0 until points.size).random()]
 
                                 lastPoint = point
@@ -258,12 +260,10 @@ object Main {
                                 rescueAreaPosition.array[0] = point.x.toFloat()
                                 rescueAreaPosition.array[1] = point.y.toFloat()
 
-                                points.remove(point)
-
                                 sim.simxSetObjectPosition(clientId, actualVictim.handle, -1, rescueAreaPosition, remoteApi.simx_opmode_oneshot)
 
                                 if (victims.isEmpty()) {
-                                    sim.simxPauseSimulation(clientId, remoteApi.simx_opmode_oneshot)
+                                    sim.simxPauseSimulation(clientId, remoteApi.simx_opmode_blocking)
                                     break@loop
                                 }
 
@@ -280,7 +280,7 @@ object Main {
                         }
 
                         if (action == "catch" && distance <= 0.01) {
-                            sendCommand("color:${actualVictim.handle}:1,1,0")
+                            sendCommand("color:${actualVictim.handle}:custom")
                             action = "carry"
                         }
 
