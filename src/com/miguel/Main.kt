@@ -175,7 +175,7 @@ object Main {
 
             val linePID = Pid(1.5, .0, .0, 3.0, 0.0)
 
-            val distancePID = Pid(3.0, 0.5, .0, 6.0, 0.8)
+            val distancePID = Pid(3.0, 0.5, .0, 5.0, 0.85)
             val anglePID = Pid(5.0, .0, .0, 8.0, 0.0)
 
             val finish = Vector(-2.5, -1.75, 0.02)
