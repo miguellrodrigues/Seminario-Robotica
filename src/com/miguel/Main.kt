@@ -301,33 +301,33 @@ object Main {
                     if (it.getState()) {
                         when (proximitySensors.indexOf(it)) {
                             0 -> {
-                                leftVelocity = vRef
+                                leftVelocity += vRef
                                 rightVelocity = 0.0
                             }
 
                             1 -> {
-                                leftVelocity = vRef
+                                leftVelocity += vRef
                                 rightVelocity = 0.0
                             }
 
                             2 -> {
-                                leftVelocity = vRef
+                                leftVelocity += vRef
                                 rightVelocity = 0.0
                             }
 
                             3 -> {
                                 leftVelocity = 0.0
-                                rightVelocity = vRef
+                                rightVelocity += vRef
                             }
 
                             4 -> {
                                 leftVelocity = 0.0
-                                rightVelocity = vRef
+                                rightVelocity += vRef
                             }
 
                             5 -> {
                                 leftVelocity = 0.0
-                                rightVelocity = vRef
+                                rightVelocity += vRef
                             }
 
                             6 -> {
