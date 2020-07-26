@@ -10,10 +10,22 @@ Essas instruções fornecerão uma cópia do projeto em funcionamento em sua má
 
 Coppelia sim e um compilador Java (Kotlin)
 
+``` 
+  Use a dll referente ao seu sistema operacional
+```
+
+E necessário a alteração da localização da DLL no arquivo coppelia/remoteApi
+
 ### Instalando
 
 Clone o repositório e execute o arquivo Main.kt
 
-``` 
-  Use a dll referente ao seu sistema operacional
-```
+<ul>
+  
+  <li>```Abra o arquivo .ttt utilizando o Coppelia Sim```</li>
+  <li>```Execute o arquivo com/miguel/Main.kt```</li>
+  
+</ul>
+
+
+
