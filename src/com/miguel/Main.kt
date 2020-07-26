@@ -264,7 +264,7 @@ object Main {
                                 sim.simxSetObjectPosition(clientId, actualVictim.handle, -1, rescueAreaPosition, remoteApi.simx_opmode_oneshot)
 
                                 if (victims.isEmpty()) {
-                                    sim.simxPauseSimulation(clientId, remoteApi.simx_opmode_blocking)
+                                    sim.simxStopSimulation(clientId, remoteApi.simx_opmode_blocking)
                                     break@loop
                                 }
 

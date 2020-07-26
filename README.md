@@ -14,7 +14,9 @@ Coppelia sim e um compilador Java (Kotlin)
   Use a dll referente ao seu sistema operacional
 ```
 
-E necessário a alteração da localização da DLL no arquivo coppelia/remoteApi
+<p>
+    Faz se necessário a alteração da localização da DLL no arquivo <u>coppelia/remoteApi</u> linha 704
+</p>
 
 ### Instalando
 
@@ -22,8 +24,8 @@ Clone o repositório e execute o arquivo Main.kt
 
 <ul>
   
-  <li>```Abra o arquivo .ttt utilizando o Coppelia Sim```</li>
-  <li>```Execute o arquivo com/miguel/Main.kt```</li>
+  <li>Abra o arquivo <u>seminario.ttt</u> utilizando o Coppelia Sim</li>
+  <li>Execute o arquivo <u>com/miguel/Main.kt</u></li>
   
 </ul>
 
