@@ -14,8 +14,6 @@ Coppelia sim e um compilador Java (Kotlin)
 
 Clone o repositório e execute o arquivo Main.kt
 
-Diga o que o passo será
-
 ``` 
   Use a dll referente ao seu sistema operacional
 ```
