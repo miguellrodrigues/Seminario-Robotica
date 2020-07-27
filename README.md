@@ -30,4 +30,8 @@ Clone o repositório e execute o arquivo Main.kt
 </ul>
 
 
+### Autores
+
+<h2>Miguel L. Rodrigues</h2> <h4>e</h4> <h2>Gabriel Medeiros</h2>
+
 
