@@ -32,8 +32,12 @@ Clone o repositório e execute o arquivo Main.kt
 
 ### Autores
 
-<h2>Miguel L. Rodrigues</h2>
+<h2>
+  <a href="https://github.com/miguellrodrigues">Miguel L. Rodrigues</a>
+</h2>
 
-<h2>Gabriel Medeiros</h2>
+<h2>
+  <a href="https://github.com/GabrielMdrs">Gabriel Medeiros</a>
+</h2>
 
 
