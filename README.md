@@ -4,7 +4,7 @@ Este projeto faz parte do curso de Robótica do Cefet-MG
 
 ## Começando
 
-Essas instruções fornecerão uma cópia do projeto em funcionamento em sua máquina local para fins de desenvolvimento e teste. Consulte a implantação de notas sobre como implantar o projeto em um sistema ao vivo.
+Essas instruções fornecerão uma cópia do projeto em funcionamento em sua máquina local para fins de desenvolvimento e teste.
 
 ### Pré-requisitos
 
