@@ -14,8 +14,16 @@ object Main {
 
     private const val robot = "ePuck"
 
-    private var state = "maze"
-    private var action = "catch"
+    enum class State {
+        MAZE, RESCUE
+    }
+
+    enum class Action {
+        CATCH, CARRY
+    }
+
+    private var state = State.MAZE
+    private var action = Action.CATCH
 
     private val sim = remoteApi()
 
@@ -201,11 +209,11 @@ object Main {
                 val robotVector = Vector(robotPos.array[0].toDouble(), robotPos.array[1].toDouble(), robotPos.array[2].toDouble())
 
                 when (state) {
-                    "maze" -> {
+                    State.MAZE -> {
                         val distance = robotVector.distance(finish)
 
                         if (distance <= 0.4) {
-                            state = "rescue"
+                            state = State.RESCUE
                             continue@loop
                         }
 
@@ -233,20 +241,20 @@ object Main {
                         }
                     }
 
-                    "rescue" -> {
-                        val distance = if (action == "catch") {
+                    State.RESCUE -> {
+                        val distance = if (action == Action.CATCH) {
                             robotVector.distance(actualVictim.position)
                         } else {
                             robotVector.distance(rescueArea)
                         }
 
-                        val theta = if (action == "catch") {
+                        val theta = if (action == Action.CATCH) {
                             robotVector.differenceAngle(actualVictim.position)
                         } else {
                             robotVector.differenceAngle(rescueArea)
                         }
 
-                        if (action == "carry") {
+                        if (action == Action.CARRY) {
                             if (distance <= 0.01) {
                                 points.remove(lastPoint)
 
@@ -272,7 +280,7 @@ object Main {
 
                                 actualVictim = victims.removeFirst()
 
-                                action = "catch"
+                                action = Action.CATCH
 
                                 continue@loop
                             } else {
@@ -282,9 +290,9 @@ object Main {
                             }
                         }
 
-                        if (action == "catch" && distance <= 0.01) {
+                        if (action == Action.CATCH && distance <= 0.01) {
                             sendCommand("color:${actualVictim.handle}:custom")
-                            action = "carry"
+                            action = Action.CARRY
                         }
 
                         val angleOUT = anglePID.update(Angle.normalizeRadian((robotOrientation.array[2] + PI / 2) - theta), 0.05)
