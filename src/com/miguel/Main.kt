@@ -310,31 +310,31 @@ object Main {
                         when (proximitySensors.indexOf(it)) {
                             0 -> {
                                 leftVelocity += vRef
-                                rightVelocity = 0.0
+                                rightVelocity -= vRef
                             }
 
                             1 -> {
                                 leftVelocity += vRef
-                                rightVelocity = 0.0
+                                rightVelocity -= vRef
                             }
 
                             2 -> {
                                 leftVelocity += vRef
-                                rightVelocity = 0.0
+                                rightVelocity -= vRef
                             }
 
                             3 -> {
-                                leftVelocity = 0.0
+                                leftVelocity -= vRef
                                 rightVelocity += vRef
                             }
 
                             4 -> {
-                                leftVelocity = 0.0
+                                leftVelocity -= vRef
                                 rightVelocity += vRef
                             }
 
                             5 -> {
-                                leftVelocity = 0.0
+                                leftVelocity -= vRef
                                 rightVelocity += vRef
                             }
 
