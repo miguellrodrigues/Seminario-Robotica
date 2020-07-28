@@ -183,7 +183,7 @@ object Main {
 
             val linePID = Pid(1.5, .0, .0, 3.0, 0.0)
 
-            val distancePID = Pid(3.0, 0.5, .0, 5.0, 0.85)
+            val distancePID = Pid(2.0, 0.5, .0, 5.0, 0.85)
             val anglePID = Pid(5.0, .0, .0, 8.0, 0.0)
 
             val finish = Vector(-2.5, -1.75, 0.02)
@@ -195,9 +195,9 @@ object Main {
 
             val points = Angle.getCircumferencePoints(rescueArea, 0.5)
 
-            var lastPoint = points[(0 until points.size).random()]
-
             points.shuffle()
+
+            var lastPoint = points[(0 until points.size).random()]
 
             sim.simxStartSimulation(clientId, remoteApi.simx_opmode_oneshot)
 
@@ -236,8 +236,8 @@ object Main {
 
                             val out = linePID.update(-(normalizedLeft - normalizedRight), 0.05)
 
-                            rightVelocity = vRef - out
-                            leftVelocity = vRef + out
+                            rightVelocity -= out
+                            leftVelocity += out
                         }
                     }
 
@@ -338,13 +338,13 @@ object Main {
                                 rightVelocity += vRef
                             }
 
-                            6 -> {
+                            /*6 -> {
 
                             }
 
                             7 -> {
 
-                            }
+                            }*/
 
                             else -> {
                             }
