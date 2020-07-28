@@ -18,6 +18,13 @@ Coppelia sim e um compilador Java (Kotlin)
     Faz se necessário a alteração da localização da DLL no arquivo <u>coppelia/remoteApi</u> linha 704
 </p>
 
+``` java
+
+  static {
+      System.load("Path da dll")
+  }
+```
+
 ### Instalando
 
 Clone o repositório e execute o arquivo Main.kt
