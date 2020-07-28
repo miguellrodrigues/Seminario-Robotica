@@ -8,7 +8,7 @@ Essas instruções fornecerão uma cópia do projeto em funcionamento em sua má
 
 ### Pré-requisitos
 
-Coppelia sim e um compilador Java (Kotlin)
+CoppeliaSim e um compilador Java (Kotlin)
 
 ``` 
   Use a dll referente ao seu sistema operacional
@@ -31,7 +31,7 @@ Clone o repositório
 
 <ul>
   
-  <li>Abra o arquivo <u>seminario.ttt</u> utilizando o Coppelia Sim</li>
+  <li>Abra o arquivo <u>seminario.ttt</u> utilizando o CoppeliaSim</li>
   <li>Execute o arquivo <u>com/miguel/Main.kt</u></li>
   
 </ul>
