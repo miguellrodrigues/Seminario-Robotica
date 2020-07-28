@@ -33,11 +33,15 @@ Clone o repositório e execute o arquivo Main.kt
 ### Autores
 
 <h2>
-  <a href="https://github.com/miguellrodrigues">Miguel L. Rodrigues</a>
+  <a href="https://github.com/miguellrodrigues">
+    <img src="assets/Miguel.jpg" width="250" height="250" title="Miguel L. Rodrigues">
+  </a>
 </h2>
 
 <h2>
-  <a href="https://github.com/GabrielMdrs">Gabriel Medeiros</a>
+  <a href="https://github.com/GabrielMdrs">
+      <img src="assets/Gabriel.jpg" width="250" height="250" title="Gabriel Medeiros">
+  </a>
 </h2>
 
 
