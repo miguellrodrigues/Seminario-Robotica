@@ -4,11 +4,11 @@ Este projeto faz parte do curso de Robótica do Cefet-MG
 
 ## Começando
 
-Essas instruções fornecerão uma cópia do projeto em funcionamento em sua máquina local para fins de desenvolvimento e teste. Consulte a implantação de notas sobre como implantar o projeto em um sistema ao vivo.
+Essas instruções fornecerão uma cópia do projeto em funcionamento em sua máquina local para fins de desenvolvimento e teste.
 
 ### Pré-requisitos
 
-Coppelia sim e um compilador Java (Kotlin)
+CoppeliaSim e um compilador Java (Kotlin)
 
 ``` 
   Use a dll referente ao seu sistema operacional
@@ -18,13 +18,20 @@ Coppelia sim e um compilador Java (Kotlin)
     Faz se necessário a alteração da localização da DLL no arquivo <u>coppelia/remoteApi</u> linha 704
 </p>
 
+``` java
+
+  static {
+      System.load("Path da dll")
+  }
+```
+
 ### Instalando
 
-Clone o repositório e execute o arquivo Main.kt
+Clone o repositório
 
 <ul>
   
-  <li>Abra o arquivo <u>seminario.ttt</u> utilizando o Coppelia Sim</li>
+  <li>Abra o arquivo <u>seminario.ttt</u> utilizando o CoppeliaSim</li>
   <li>Execute o arquivo <u>com/miguel/Main.kt</u></li>
   
 </ul>
