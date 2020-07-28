@@ -27,7 +27,7 @@ Coppelia sim e um compilador Java (Kotlin)
 
 ### Instalando
 
-Clone o repositório e execute o arquivo Main.kt
+Clone o repositório
 
 <ul>
   
