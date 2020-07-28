@@ -31,31 +31,3 @@ Clone o repositório e execute o arquivo Main.kt
 
 
 ### Autores
-
-<table>
-  <tr>
-    <td>Miguel Rodrigues</td>
-    <td>Gabriel Medeiros</td>
-  </tr>
-  
-  <tr>
-    <td>
-        <a href="https://github.com/miguellrodrigues">
-            <img src="assets/Miguel.jpg" width="150" height="150">
-        </a>
-    </td>
-    <td>
-        <a href="https://github.com/GabrielMdrs">
-            <img src="assets/Gabriel.jpg" width="150" height="150">
-        </a>
-    </td>
-  </tr>
-  
-</table>
-
-
-
-
-
-
-
