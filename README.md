@@ -31,3 +31,6 @@ Clone o repositório e execute o arquivo Main.kt
 
 
 ### Autores
+
+
+| [<img src="https://avatars1.githubusercontent.com/miguellrodrigues" width="115"><br><sub>@Miguel</sub>](https://github.com/miguellrodrigues) | [<img src="https://avatars1.githubusercontent.com/gabrielmdrs" width="115"><br><sub>@Gabriel</sub>](https://github.com/gabrielmdrs) 
