@@ -242,57 +242,56 @@ object Main {
                     }
 
                     State.RESCUE -> {
-                        val distance = if (action == Action.CATCH) {
-                            robotVector.distance(actualVictim.position)
-                        } else {
-                            robotVector.distance(rescueArea)
-                        }
+                        val distance: Double
+                        val theta: Double
 
-                        val theta = if (action == Action.CATCH) {
-                            robotVector.differenceAngle(actualVictim.position)
-                        } else {
-                            robotVector.differenceAngle(rescueArea)
-                        }
+                        when (action) {
+                            Action.CATCH -> {
+                                distance = robotVector.distance(actualVictim.position)
+                                theta = robotVector.differenceAngle(actualVictim.position)
 
-                        if (action == Action.CARRY) {
-                            if (distance <= 0.01) {
-                                points.remove(lastPoint)
-
-                                var point = points[(0 until points.size).random()]
-
-                                while (lastPoint.distance(point) <= 0.75) {
-                                    point = points[(0 until points.size).random()]
+                                if (distance <= 0.01) {
+                                    sendCommand("color:${actualVictim.handle}:custom")
+                                    action = Action.CARRY
                                 }
-
-                                lastPoint = point
-
-                                rescueAreaPosition.array[0] = point.x.toFloat()
-                                rescueAreaPosition.array[1] = point.y.toFloat()
-
-                                sim.simxSetObjectPosition(clientId, actualVictim.handle, -1, rescueAreaPosition, remoteApi.simx_opmode_oneshot)
-
-                                if (victims.isEmpty()) {
-                                    sim.simxStopSimulation(clientId, remoteApi.simx_opmode_blocking)
-                                    break@loop
-                                }
-
-                                sendCommand("color:${actualVictim.handle}:rescued_custom")
-
-                                actualVictim = victims.removeFirst()
-
-                                action = Action.CATCH
-
-                                continue@loop
-                            } else {
-                                robotPos.array[2] = 0.002.toFloat()
-
-                                sim.simxSetObjectPosition(clientId, actualVictim.handle, -1, robotPos, remoteApi.simx_opmode_oneshot)
                             }
-                        }
 
-                        if (action == Action.CATCH && distance <= 0.01) {
-                            sendCommand("color:${actualVictim.handle}:custom")
-                            action = Action.CARRY
+                            Action.CARRY -> {
+                                distance = robotVector.distance(rescueArea)
+                                theta = robotVector.differenceAngle(rescueArea)
+
+                                if (distance < 0.01) {
+                                    points.remove(lastPoint)
+
+                                    var point = points[(0 until points.size).random()]
+
+                                    while (lastPoint.distance(point) <= 1.0) {
+                                        point = points[(0 until points.size).random()]
+                                    }
+
+                                    lastPoint = point
+
+                                    rescueAreaPosition.array[0] = point.x.toFloat()
+                                    rescueAreaPosition.array[1] = point.y.toFloat()
+
+                                    sim.simxSetObjectPosition(clientId, actualVictim.handle, -1, rescueAreaPosition, remoteApi.simx_opmode_oneshot)
+
+                                    if (victims.isEmpty()) {
+                                        sim.simxStopSimulation(clientId, remoteApi.simx_opmode_blocking)
+                                        break@loop
+                                    }
+
+                                    sendCommand("color:${actualVictim.handle}:rescued_custom")
+
+                                    actualVictim = victims.removeFirst()
+
+                                    action = Action.CATCH
+                                } else {
+                                    robotPos.array[2] = 0.002.toFloat()
+
+                                    sim.simxSetObjectPosition(clientId, actualVictim.handle, -1, robotPos, remoteApi.simx_opmode_oneshot)
+                                }
+                            }
                         }
 
                         val angleOUT = anglePID.update(Angle.normalizeRadian((robotOrientation.array[2] + PI / 2) - theta), 0.05)

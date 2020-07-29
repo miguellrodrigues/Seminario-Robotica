@@ -13,23 +13,24 @@ object Angle {
     fun getCircumferencePoints(center: Vector, radius: Double): ArrayList<Vector> {
         val points = ArrayList<Vector>()
 
-        // val radiusConstant = radius / 360
+        var j = 0.0
+        while (j <= radius) {
+            j += 0.1
 
-        for (i in 0..360) {
-            val radians = Math.toRadians(i.toDouble())
+            for (i in 0..360) {
+                val radians = Math.toRadians(i.toDouble())
 
-            // val r = radiusConstant * i
+                val x = (j * cos(radians))
+                val y = (j * sin(radians))
 
-            val x = (radius * cos(radians))
-            val y = (radius * sin(radians))
+                val point = Vector(x, y, 0.0)
 
-            val point = Vector(x, y, 0.0)
+                center.add(point)
 
-            center.add(point)
+                points.add(center.clone())
 
-            points.add(center.clone())
-
-            center.subtract(point)
+                center.subtract(point)
+            }
         }
 
         return points
