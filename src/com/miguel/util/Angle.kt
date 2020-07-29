@@ -15,7 +15,7 @@ object Angle {
 
         var j = 0.0
         while (j < radius) {
-            j += 0.25
+            j += 0.1
 
             for (i in 0..360) {
                 val radians = Math.toRadians(i.toDouble())
