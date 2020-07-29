@@ -197,7 +197,7 @@ object Main {
 
             points.shuffle()
 
-            var lastPoint = points[(0 until points.size).random()]
+            var lastPoint = points.random()
 
             sim.simxStartSimulation(clientId, remoteApi.simx_opmode_oneshot)
 
@@ -263,10 +263,10 @@ object Main {
                                 if (distance < 0.01) {
                                     points.remove(lastPoint)
 
-                                    var point = points[(0 until points.size).random()]
+                                    var point = points.random()
 
-                                    while (lastPoint.distance(point) <= 1.0) {
-                                        point = points[(0 until points.size).random()]
+                                    while (lastPoint.distance(point) <= .75) {
+                                        point = points.random()
                                     }
 
                                     lastPoint = point
