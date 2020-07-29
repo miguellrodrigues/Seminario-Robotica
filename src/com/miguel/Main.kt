@@ -265,7 +265,7 @@ object Main {
 
                                     var point = points.random()
 
-                                    while (lastPoint.distance(point) <= .75) {
+                                    while (lastPoint.distance(point) <= .3) {
                                         point = points.random()
                                     }
 
