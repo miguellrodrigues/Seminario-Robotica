@@ -255,6 +255,8 @@ object Main {
                                 if (distance <= 0.01) {
                                     sendCommand("color:${actualVictim.handle}:custom")
                                     action = Action.CARRY
+
+                                    theta = robotVector.differenceAngle(actualVictim.position)
                                 }
                             }
 
