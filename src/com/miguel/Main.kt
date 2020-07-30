@@ -181,7 +181,7 @@ object Main {
             val white = 0.8
             val black = 0.5
 
-            val linePID = Pid(1.5, .0, .0, 3.0, 0.0)
+            val linePID = Pid(1.75, .0, .0, 3.0, 0.0)
 
             val distancePID = Pid(2.0, 0.5, .0, 5.0, 0.85)
             val anglePID = Pid(5.0, .0, .0, 8.0, 0.0)
@@ -200,6 +200,10 @@ object Main {
             var lastPoint = points.random()
 
             sim.simxStartSimulation(clientId, remoteApi.simx_opmode_oneshot)
+
+            var theta = 0.0
+
+            val r = 0.785398163397
 
             loop@ while (running) {
                 sim.simxGetObjectPosition(clientId, robotHandle.value, -1, robotPos, remoteApi.simx_opmode_buffer)
@@ -243,12 +247,10 @@ object Main {
 
                     State.RESCUE -> {
                         val distance: Double
-                        val theta: Double
 
                         when (action) {
                             Action.CATCH -> {
                                 distance = robotVector.distance(actualVictim.position)
-                                theta = robotVector.differenceAngle(actualVictim.position)
 
                                 if (distance <= 0.01) {
                                     sendCommand("color:${actualVictim.handle}:custom")
@@ -258,7 +260,6 @@ object Main {
 
                             Action.CARRY -> {
                                 distance = robotVector.distance(rescueArea)
-                                theta = robotVector.differenceAngle(rescueArea)
 
                                 if (distance < 0.01) {
                                     points.remove(lastPoint)
@@ -299,6 +300,12 @@ object Main {
 
                         rightVelocity = -angleOUT + distanceOUT
                         leftVelocity = angleOUT + distanceOUT
+
+                        theta = if (action == Action.CATCH) {
+                            robotVector.differenceAngle(actualVictim.position)
+                        } else {
+                            robotVector.differenceAngle(rescueArea)
+                        }
                     }
                 }
 
@@ -306,46 +313,21 @@ object Main {
                     sim.simxReadProximitySensor(clientId, it.handle, it.detectionState, it.detectedPoint, null, null, remoteApi.simx_opmode_buffer)
 
                     if (it.getState()) {
-                        when (proximitySensors.indexOf(it)) {
-                            0 -> {
+                        val indexOf = proximitySensors.indexOf(it)
+
+                        if (indexOf < 3) {
+                            if (state == State.MAZE) {
                                 leftVelocity += vRef
                                 rightVelocity -= vRef
+                            } else {
+                                theta -= r
                             }
-
-                            1 -> {
-                                leftVelocity += vRef
-                                rightVelocity -= vRef
-                            }
-
-                            2 -> {
-                                leftVelocity += vRef
-                                rightVelocity -= vRef
-                            }
-
-                            3 -> {
+                        } else {
+                            if (state == State.MAZE) {
                                 leftVelocity -= vRef
                                 rightVelocity += vRef
-                            }
-
-                            4 -> {
-                                leftVelocity -= vRef
-                                rightVelocity += vRef
-                            }
-
-                            5 -> {
-                                leftVelocity -= vRef
-                                rightVelocity += vRef
-                            }
-
-                            /*6 -> {
-
-                            }
-
-                            7 -> {
-
-                            }*/
-
-                            else -> {
+                            } else {
+                                theta += r
                             }
                         }
                     }
