@@ -181,7 +181,7 @@ object Main {
             val white = 0.8
             val black = 0.5
 
-            val linePID = Pid(1.75, .0, .0, 3.0, 0.0)
+            val linePID = Pid(1.5, .0, .0, 3.0, 0.0)
 
             val distancePID = Pid(2.0, 0.5, .0, 5.0, 0.85)
             val anglePID = Pid(5.0, .0, .0, 8.0, 0.0)
@@ -203,7 +203,7 @@ object Main {
 
             var theta = 0.0
 
-            val r = 0.785398163397
+            val r = Math.toRadians(45.0)
 
             loop@ while (running) {
                 sim.simxGetObjectPosition(clientId, robotHandle.value, -1, robotPos, remoteApi.simx_opmode_buffer)
@@ -238,7 +238,7 @@ object Main {
                             val normalizedLeft = (sensors[0] - white) / (black - white)
                             val normalizedRight = (sensors[2] - white) / (black - white)
 
-                            val out = linePID.update(-(normalizedLeft - normalizedRight), 0.05)
+                            val out = linePID.update(-(normalizedLeft - normalizedRight), 0.1)
 
                             rightVelocity -= out
                             leftVelocity += out
